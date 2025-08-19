@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
-import type { User, Transaction, ActivityLog } from './types';
+import type { User, Transaction, ActivityLog, Balance } from './types';
 
 // Use a static date for consistent data generation
-const refDate = new Date('2024-01-01T00:00:00.000Z');
+const refDate = new Date('2024-07-18T10:00:00.000Z');
 faker.seed(123);
 
 const generateUsers = (count: number): User[] => {
@@ -31,7 +31,7 @@ const generateTransactions = (count: number, userList: User[]): Transaction[] =>
       userId: user.id,
       userName: user.name,
       userAvatar: user.avatar,
-      amount: faker.finance.amount({ min: 5, max: 5000, dec: 2 }),
+      amount: parseFloat(faker.finance.amount({ min: 5, max: 5000, dec: 2 })),
       date: faker.date.recent({ days: 90, refDate }).toISOString(),
       status: faker.helpers.arrayElement(['Completed', 'Pending', 'Failed']),
       type: faker.helpers.arrayElement(['deposit', 'withdrawal', 'transfer']),
@@ -69,3 +69,15 @@ const generateActivityLogs = (count: number, userList: User[]): ActivityLog[] =>
 };
 
 export const activityLogs: ActivityLog[] = generateActivityLogs(50, users);
+
+const generateBalances = (userList: User[]): Balance[] => {
+  return userList.map(user => ({
+    userId: user.id,
+    userName: user.name,
+    userAvatar: user.avatar,
+    balance: parseFloat(faker.finance.amount({ min: 100, max: 50000, dec: 2 })),
+    currency: faker.finance.currencyCode(),
+  }));
+};
+
+export const balances: Balance[] = generateBalances(users);

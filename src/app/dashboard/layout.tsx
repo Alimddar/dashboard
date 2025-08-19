@@ -66,6 +66,14 @@ export default function DashboardLayout({
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
+             <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={isActive('/dashboard/balances')} tooltip="Balances">
+                <Link href="/dashboard/balances">
+                  <CreditCard />
+                  <span>Balances</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={isActive('/dashboard/activity')} tooltip="Activity">
                 <Link href="/dashboard/activity">

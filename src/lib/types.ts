@@ -27,3 +27,11 @@ export type ActivityLog = {
   details: string;
   timestamp: string;
 };
+
+export type Balance = {
+  userId: string;
+  userName: string;
+  userAvatar: string;
+  balance: number;
+  currency: string;
+};
