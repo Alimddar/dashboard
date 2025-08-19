@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { subDays } from 'date-fns';
 import type { User, Transaction, ActivityLog, Balance } from './types';
 
 // Use a static date for consistent data generation
@@ -13,7 +14,8 @@ const generateUsers = (count: number): User[] => {
       name: faker.person.fullName(),
       email: faker.internet.email(),
       role: faker.helpers.arrayElement(['Admin', 'Editor', 'Viewer']),
-      joinedDate: faker.date.past({ years: 2, refDate }).toISOString(),
+      // Use a deterministic date based on index to avoid hydration issues
+      joinedDate: subDays(refDate, i * 30 + 10).toISOString(),
     });
   }
   return users;
