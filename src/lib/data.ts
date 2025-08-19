@@ -1,0 +1,67 @@
+import { faker } from '@faker-js/faker';
+import type { User, Transaction, ActivityLog } from './types';
+
+const generateUsers = (count: number): User[] => {
+  const users: User[] = [];
+  for (let i = 0; i < count; i++) {
+    users.push({
+      id: faker.string.uuid(),
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+      role: faker.helpers.arrayElement(['Admin', 'Editor', 'Viewer']),
+      joinedDate: faker.date.past({ years: 2 }).toISOString(),
+      avatar: faker.image.avatarGitHub(),
+    });
+  }
+  return users;
+};
+
+export const users: User[] = generateUsers(10);
+
+const generateTransactions = (count: number, userList: User[]): Transaction[] => {
+  const transactions: Transaction[] = [];
+  for (let i = 0; i < count; i++) {
+    const user = faker.helpers.arrayElement(userList);
+    transactions.push({
+      id: faker.string.uuid(),
+      userId: user.id,
+      userName: user.name,
+      userAvatar: user.avatar,
+      amount: faker.finance.amount({ min: 5, max: 5000, dec: 2 }),
+      date: faker.date.recent({ days: 90 }).toISOString(),
+      status: faker.helpers.arrayElement(['Completed', 'Pending', 'Failed']),
+      type: faker.helpers.arrayElement(['deposit', 'withdrawal', 'transfer']),
+    });
+  }
+  return transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+};
+
+export const transactions: Transaction[] = generateTransactions(100, users);
+
+const generateActivityLogs = (count: number, userList: User[]): ActivityLog[] => {
+  const logs: ActivityLog[] = [];
+  const actions = [
+    'Logged in',
+    'Updated profile',
+    'Created a new user',
+    'Deleted a user',
+    'Viewed transaction report',
+    'Flagged a transaction',
+    'Changed user permissions',
+  ];
+  for (let i = 0; i < count; i++) {
+    const user = faker.helpers.arrayElement(userList.filter(u => u.role === 'Admin' || u.role === 'Editor'));
+    logs.push({
+      id: faker.string.uuid(),
+      userId: user.id,
+      userName: user.name,
+      userAvatar: user.avatar,
+      action: faker.helpers.arrayElement(actions),
+      details: `User ${user.name} performed an action.`,
+      timestamp: faker.date.recent({ days: 30 }).toISOString(),
+    });
+  }
+  return logs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+};
+
+export const activityLogs: ActivityLog[] = generateActivityLogs(50, users);
