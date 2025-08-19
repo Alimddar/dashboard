@@ -5,7 +5,6 @@ import type { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon, Filter, Search, ShieldAlert, BadgePercent, AlertTriangle } from 'lucide-react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -201,10 +200,6 @@ export function TransactionsClient({
                   <TableRow key={transaction.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9">
-                          <AvatarImage src={transaction.userAvatar} alt={transaction.userName} data-ai-hint="avatar" />
-                          <AvatarFallback>{transaction.userName.charAt(0)}</AvatarFallback>
-                        </Avatar>
                         <div>
                           <p className="font-medium">{transaction.userName}</p>
                           <p className="text-sm text-muted-foreground">{transaction.id.substring(0, 8)}</p>

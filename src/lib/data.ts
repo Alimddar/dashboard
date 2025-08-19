@@ -14,7 +14,6 @@ const generateUsers = (count: number): User[] => {
       email: faker.internet.email(),
       role: faker.helpers.arrayElement(['Admin', 'Editor', 'Viewer']),
       joinedDate: faker.date.past({ years: 2, refDate }).toISOString(),
-      avatar: faker.image.avatarGitHub(),
     });
   }
   return users;
@@ -30,7 +29,6 @@ const generateTransactions = (count: number, userList: User[]): Transaction[] =>
       id: faker.string.uuid(),
       userId: user.id,
       userName: user.name,
-      userAvatar: user.avatar,
       amount: parseFloat(faker.finance.amount({ min: 5, max: 5000, dec: 2 })),
       date: faker.date.recent({ days: 90, refDate }).toISOString(),
       status: faker.helpers.arrayElement(['Completed', 'Pending', 'Failed']),
@@ -59,7 +57,6 @@ const generateActivityLogs = (count: number, userList: User[]): ActivityLog[] =>
       id: faker.string.uuid(),
       userId: user.id,
       userName: user.name,
-      userAvatar: user.avatar,
       action: faker.helpers.arrayElement(actions),
       details: `User ${user.name} performed an action.`,
       timestamp: faker.date.recent({ days: 30, refDate }).toISOString(),
@@ -74,7 +71,6 @@ const generateBalances = (userList: User[]): Balance[] => {
   return userList.map(user => ({
     userId: user.id,
     userName: user.name,
-    userAvatar: user.avatar,
     balance: parseFloat(faker.finance.amount({ min: 100, max: 50000, dec: 2 })),
     currency: faker.finance.currencyCode(),
   }));

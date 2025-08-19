@@ -15,7 +15,6 @@ import {
   SidebarInset,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -25,7 +24,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { CreditCard, History, LogOut, Settings, ShieldCheck, Users, LayoutDashboard } from 'lucide-react';
+import { CreditCard, History, LogOut, Settings, ShieldCheck, Users, LayoutDashboard, UserCircle } from 'lucide-react';
 import { Toaster } from '@/components/ui/toaster';
 
 export default function DashboardLayout({
@@ -88,10 +87,9 @@ export default function DashboardLayout({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-auto w-full justify-start gap-2 p-2">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                  <AvatarFallback>AD</AvatarFallback>
-                </Avatar>
+                <div className="h-8 w-8 flex items-center justify-center">
+                  <UserCircle className="h-6 w-6" />
+                </div>
                 <div className="text-left">
                   <p className="text-sm font-medium">Admin</p>
                   <p className="text-xs text-sidebar-foreground/70">admin@example.com</p>

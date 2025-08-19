@@ -1,9 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { format } from 'date-fns';
-
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { Balance, User } from '@/lib/types';
@@ -38,10 +35,6 @@ export function BalancesClient({
                   <TableRow key={balance.userId}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9">
-                          <AvatarImage src={balance.userAvatar} alt={balance.userName} data-ai-hint="avatar" />
-                          <AvatarFallback>{balance.userName.charAt(0)}</AvatarFallback>
-                        </Avatar>
                         <div>
                           <p className="font-medium">{balance.userName}</p>
                           <p className="text-sm text-muted-foreground">{users.find(u => u.id === balance.userId)?.email}</p>
