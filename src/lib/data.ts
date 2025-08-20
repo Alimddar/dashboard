@@ -22,10 +22,27 @@ const generateUsers = (count: number): User[] => {
 
 export const users: User[] = generateUsers(10);
 
-const generateTransactions = (count: number, userList: User[]): Transaction[] => {
+const generatePaymentCards = (count: number): PaymentCard[] => {
+    const cards: PaymentCard[] = [];
+    for (let i = 0; i < count; i++) {
+        cards.push({
+            id: faker.string.uuid(),
+            provider: faker.helpers.arrayElement(['Visa', 'Mastercard', 'Amex', 'Discover']),
+            lastFour: faker.string.numeric(4),
+            expiryDate: `${faker.number.int({min: 1, max: 12}).toString().padStart(2, '0')}/${faker.number.int({min: 25, max: 30})}`,
+            status: faker.helpers.arrayElement(['Active', 'Inactive']),
+        });
+    }
+    return cards;
+};
+
+export const paymentCards: PaymentCard[] = generatePaymentCards(4);
+
+const generateTransactions = (count: number, userList: User[], cardList: PaymentCard[]): Transaction[] => {
   const transactions: Transaction[] = [];
   for (let i = 0; i < count; i++) {
     const user = userList[i % userList.length]; // Cycle through users deterministically
+    const card = cardList[i % cardList.length]; // Cycle through cards deterministically
     transactions.push({
       id: faker.string.uuid(),
       userId: user.id,
@@ -35,12 +52,15 @@ const generateTransactions = (count: number, userList: User[]): Transaction[] =>
       date: subDays(refDate, i).toISOString(),
       status: faker.helpers.arrayElement(['Completed', 'Pending', 'Failed']),
       type: faker.helpers.arrayElement(['deposit', 'withdrawal', 'transfer']),
+      cardId: card.id,
+      cardProvider: card.provider,
+      cardLastFour: card.lastFour,
     });
   }
   return transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 };
 
-export const transactions: Transaction[] = generateTransactions(100, users);
+export const transactions: Transaction[] = generateTransactions(100, users, paymentCards);
 
 const generateActivityLogs = (count: number, userList: User[]): ActivityLog[] => {
   const logs: ActivityLog[] = [];
@@ -79,20 +99,3 @@ const generateBalances = (userList: User[]): Balance[] => {
 };
 
 export const balances: Balance[] = generateBalances(users);
-
-
-const generatePaymentCards = (count: number): PaymentCard[] => {
-    const cards: PaymentCard[] = [];
-    for (let i = 0; i < count; i++) {
-        cards.push({
-            id: faker.string.uuid(),
-            provider: faker.helpers.arrayElement(['Visa', 'Mastercard', 'Amex', 'Discover']),
-            lastFour: faker.string.numeric(4),
-            expiryDate: `${faker.number.int({min: 1, max: 12}).toString().padStart(2, '0')}/${faker.number.int({min: 25, max: 30})}`,
-            status: faker.helpers.arrayElement(['Active', 'Inactive']),
-        });
-    }
-    return cards;
-};
-
-export const paymentCards: PaymentCard[] = generatePaymentCards(4);

@@ -3,7 +3,7 @@
 import * as React from 'react';
 import type { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, Filter, CheckCircle, XCircle } from 'lucide-react';
+import { Calendar as CalendarIcon, Filter, CheckCircle, XCircle, ChevronDown, CreditCard } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,16 +13,19 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import type { Transaction, User } from '@/lib/types';
+import type { Transaction, User, PaymentCard } from '@/lib/types';
 
 export function TransactionsClient({
   initialTransactions,
   users,
+  cards
 }: {
   initialTransactions: Transaction[];
   users: User[];
+  cards: PaymentCard[];
 }) {
   const [transactions, setTransactions] = React.useState(initialTransactions);
   const [filters, setFilters] = React.useState({
@@ -168,58 +171,86 @@ export function TransactionsClient({
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead className="hidden md:table-cell text-center">Status</TableHead>
                 <TableHead className="text-right">Action</TableHead>
+                <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {transactions.length > 0 ? (
                 transactions.map(transaction => (
-                  <TableRow key={transaction.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div>
-                          <p className="font-medium">{transaction.userName}</p>
-                          <p className="text-sm text-muted-foreground">{transaction.id.substring(0, 8)}</p>
+                  <Collapsible asChild key={transaction.id}>
+                    <>
+                    <TableRow>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div>
+                            <p className="font-medium">{transaction.userName}</p>
+                            <p className="text-sm text-muted-foreground">{transaction.id.substring(0, 8)}</p>
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell">{format(new Date(transaction.date), 'PP')}</TableCell>
-                    <TableCell className="text-right font-medium">
-                      ${Number(transaction.amount).toFixed(2)}
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell text-center">
-                      <Badge variant={getStatusBadgeVariant(transaction.status)}>{transaction.status}</Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                       <div className="flex justify-end gap-2">
-                        {transaction.status === 'Pending' && (
-                          <>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="border-green-500 text-green-500 hover:bg-green-500 hover:text-white"
-                              onClick={() => handleUpdateTransactionStatus(transaction.id, 'Completed')}
-                            >
-                              <CheckCircle className="mr-2 h-4 w-4" />
-                              Verify
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">{format(new Date(transaction.date), 'PP')}</TableCell>
+                      <TableCell className="text-right font-medium">
+                        ${Number(transaction.amount).toFixed(2)}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell text-center">
+                        <Badge variant={getStatusBadgeVariant(transaction.status)}>{transaction.status}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                         <div className="flex justify-end gap-2">
+                          {transaction.status === 'Pending' && (
+                            <>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="border-green-500 text-green-500 hover:bg-green-500 hover:text-white"
+                                onClick={() => handleUpdateTransactionStatus(transaction.id, 'Completed')}
+                              >
+                                <CheckCircle className="mr-2 h-4 w-4" />
+                                Verify
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                                onClick={() => handleUpdateTransactionStatus(transaction.id, 'Failed')}
+                              >
+                                <XCircle className="mr-2 h-4 w-4" />
+                                Cancel
+                              </Button>
+                            </>
+                          )}
+                          </div>
+                      </TableCell>
+                      <TableCell>
+                        <CollapsibleTrigger asChild>
+                            <Button variant="ghost" size="icon" className="data-[state=open]:rotate-180">
+                                <ChevronDown className="h-4 w-4" />
+                                <span className="sr-only">Toggle details</span>
                             </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                              onClick={() => handleUpdateTransactionStatus(transaction.id, 'Failed')}
-                            >
-                              <XCircle className="mr-2 h-4 w-4" />
-                              Cancel
-                            </Button>
-                          </>
-                        )}
-                        </div>
-                    </TableCell>
-                  </TableRow>
+                        </CollapsibleTrigger>
+                      </TableCell>
+                    </TableRow>
+                    <CollapsibleContent asChild>
+                        <tr>
+                            <td colSpan={6}>
+                                <div className="p-4 bg-muted/50">
+                                    <div className="flex items-center gap-3">
+                                        <CreditCard className="w-6 h-6" />
+                                        <div>
+                                            <p className="font-medium">Payment Card</p>
+                                            <p className="text-sm text-muted-foreground">{transaction.cardProvider} ending in {transaction.cardLastFour}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </CollapsibleContent>
+                    </>
+                  </Collapsible>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-24 text-center">
+                  <TableCell colSpan={6} className="h-24 text-center">
                     No transactions found.
                   </TableCell>
                 </TableRow>

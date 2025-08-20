@@ -13,6 +13,9 @@ export type Transaction = {
   date: string;
   status: 'Completed' | 'Pending' | 'Failed';
   type: 'deposit' | 'withdrawal' | 'transfer';
+  cardId: string;
+  cardProvider: string;
+  cardLastFour: string;
 };
 
 export type ActivityLog = {
