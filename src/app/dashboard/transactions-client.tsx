@@ -3,7 +3,7 @@
 import * as React from 'react';
 import type { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, Filter, Search, ShieldAlert, BadgePercent, AlertTriangle } from 'lucide-react';
+import { Calendar as CalendarIcon, Filter, CheckCircle, XCircle } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,17 +13,9 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { AnomalyDialog } from '@/components/anomaly-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import type { Transaction, User } from '@/lib/types';
-import { detectTransactionAnomaly } from './actions';
-
-type AnomalyResult = {
-  isAnomalous: boolean;
-  explanation: string;
-  riskScore: number;
-} | null;
 
 export function TransactionsClient({
   initialTransactions,
@@ -40,9 +32,6 @@ export function TransactionsClient({
     dateRange: undefined as DateRange | undefined,
   });
 
-  const [anomalyResult, setAnomalyResult] = React.useState<AnomalyResult>(null);
-  const [isCheckingAnomaly, setIsCheckingAnomaly] = React.useState(false);
-  const [selectedTransaction, setSelectedTransaction] = React.useState<Transaction | null>(null);
   const { toast } = useToast();
 
   React.useEffect(() => {
@@ -66,30 +55,17 @@ export function TransactionsClient({
 
     setTransactions(filtered);
   }, [filters, initialTransactions]);
-
-  const handleCheckAnomaly = async (transaction: Transaction) => {
-    setSelectedTransaction(transaction);
-    setIsCheckingAnomaly(true);
-    setAnomalyResult(null);
-
-    try {
-      const historicalData = initialTransactions.filter(t => t.userId === transaction.userId && t.id !== transaction.id);
-      const result = await detectTransactionAnomaly(transaction, historicalData);
-      setAnomalyResult(result);
-    } catch (error) {
-      console.error('Failed to detect anomaly:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to check for anomaly. Please try again.',
-      });
-      setIsCheckingAnomaly(false);
-    }
-  };
-
-  const closeAnomalyDialog = () => {
-    setSelectedTransaction(null);
-    setIsCheckingAnomaly(false);
+  
+  const handleUpdateTransactionStatus = (transactionId: string, status: 'Completed' | 'Failed') => {
+    setTransactions(prevTransactions =>
+      prevTransactions.map(t =>
+        t.id === transactionId ? { ...t, status } : t
+      )
+    );
+    toast({
+      title: 'Transaction Updated',
+      description: `Transaction status has been changed to ${status}.`,
+    });
   };
 
   const getStatusBadgeVariant = (status: Transaction['status']) => {
@@ -214,15 +190,30 @@ export function TransactionsClient({
                       <Badge variant={getStatusBadgeVariant(transaction.status)}>{transaction.status}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleCheckAnomaly(transaction)}
-                        disabled={isCheckingAnomaly && selectedTransaction?.id === transaction.id}
-                      >
-                         <ShieldAlert className="mr-2 h-4 w-4" />
-                        Check Anomaly
-                      </Button>
+                       <div className="flex justify-end gap-2">
+                        {transaction.status === 'Pending' && (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="border-green-500 text-green-500 hover:bg-green-500 hover:text-white"
+                              onClick={() => handleUpdateTransactionStatus(transaction.id, 'Completed')}
+                            >
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              Verify
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                              onClick={() => handleUpdateTransactionStatus(transaction.id, 'Failed')}
+                            >
+                              <XCircle className="mr-2 h-4 w-4" />
+                              Cancel
+                            </Button>
+                          </>
+                        )}
+                        </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -237,14 +228,6 @@ export function TransactionsClient({
           </Table>
         </CardContent>
       </Card>
-
-      <AnomalyDialog
-        isOpen={!!selectedTransaction && (isCheckingAnomaly || !!anomalyResult)}
-        onClose={closeAnomalyDialog}
-        isLoading={isCheckingAnomaly && !anomalyResult}
-        result={anomalyResult}
-        transaction={selectedTransaction}
-      />
     </div>
   );
 }
