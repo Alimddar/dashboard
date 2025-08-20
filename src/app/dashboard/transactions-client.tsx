@@ -68,7 +68,7 @@ export function TransactionsClient({
             <TableBody>
               {transactions.length > 0 ? (
                 transactions.map(transaction => (
-                  <Collapsible asChild key={transaction.id}>
+                  <Collapsible asChild key={transaction.id} tagName="tbody">
                     <>
                       <TableRow>
                         <TableCell>
