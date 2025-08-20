@@ -94,7 +94,7 @@ const generateBalances = (userList: User[]): Balance[] => {
     userId: user.id,
     userName: user.name,
     balance: parseFloat(faker.finance.amount({ min: 100, max: 50000, dec: 2 })),
-    currency: faker.finance.currencyCode(),
+    currency: 'AZN',
   }));
 };
 

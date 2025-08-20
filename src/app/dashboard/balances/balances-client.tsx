@@ -42,7 +42,7 @@ export function BalancesClient({
                       </div>
                     </TableCell>
                     <TableCell className="text-right font-medium">
-                      {new Intl.NumberFormat('en-US', { style: 'currency', currency: balance.currency }).format(balance.balance)}
+                      {new Intl.NumberFormat('az-AZ', { style: 'currency', currency: 'AZN' }).format(balance.balance)}
                     </TableCell>
                     <TableCell className="hidden sm:table-cell text-center">
                         {balance.currency}

@@ -81,7 +81,7 @@ export function TransactionsClient({
                         </TableCell>
                         <TableCell className="hidden sm:table-cell">{format(new Date(transaction.date), 'PP')}</TableCell>
                         <TableCell className="text-right font-medium">
-                          ${Number(transaction.amount).toFixed(2)}
+                          {new Intl.NumberFormat('az-AZ', { style: 'currency', currency: 'AZN' }).format(transaction.amount)}
                         </TableCell>
                         <TableCell className="hidden md:table-cell text-center">
                           <Badge variant={getStatusBadgeVariant(transaction.status)}>{transaction.status}</Badge>
