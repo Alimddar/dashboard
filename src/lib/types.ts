@@ -2,7 +2,6 @@ export type User = {
   id: string;
   name: string;
   email: string;
-  role: 'Admin' | 'Editor' | 'Viewer';
   joinedDate: string;
 };
 
@@ -30,4 +29,12 @@ export type Balance = {
   userName: string;
   balance: number;
   currency: string;
+};
+
+export type PaymentCard = {
+    id: string;
+    provider: string;
+    lastFour: string;
+    expiryDate: string;
+    status: 'Active' | 'Inactive';
 };

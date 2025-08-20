@@ -7,7 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -24,14 +23,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { User } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
 const userFormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
   email: z.string().email({ message: 'Please enter a valid email.' }),
-  role: z.enum(['Admin', 'Editor', 'Viewer']),
 });
 
 type UserFormValues = z.infer<typeof userFormSchema>;
@@ -44,15 +41,15 @@ export function UserManagementClient({ initialUsers }: { initialUsers: User[] })
 
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
-    defaultValues: { name: '', email: '', role: 'Viewer' },
+    defaultValues: { name: '', email: '' },
   });
 
   const handleOpenDialog = (user: User | null = null) => {
     setEditingUser(user);
     if (user) {
-      form.reset({ name: user.name, email: user.email, role: user.role });
+      form.reset({ name: user.name, email: user.email });
     } else {
-      form.reset({ name: '', email: '', role: 'Viewer' });
+      form.reset({ name: '', email: '' });
     }
     setIsDialogOpen(true);
   };
@@ -60,7 +57,7 @@ export function UserManagementClient({ initialUsers }: { initialUsers: User[] })
   const onSubmit = (data: UserFormValues) => {
     if (editingUser) {
       // Edit user logic
-      setUsers(users.map(u => (u.id === editingUser.id ? { ...u, ...data } : u)));
+      setUsers(users.map(u => (u.id === editingUser.id ? { ...editingUser, ...data } : u)));
       toast({ title: 'User Updated', description: `User ${data.name} has been updated.` });
     } else {
       // Add new user logic
@@ -78,18 +75,6 @@ export function UserManagementClient({ initialUsers }: { initialUsers: User[] })
   const handleDeleteUser = (userId: string) => {
     setUsers(users.filter(u => u.id !== userId));
     toast({ title: 'User Deleted', description: 'The user has been successfully deleted.', variant: 'destructive' });
-  };
-
-
-  const getRoleBadgeVariant = (role: User['role']) => {
-    switch (role) {
-      case 'Admin':
-        return 'default';
-      case 'Editor':
-        return 'secondary';
-      case 'Viewer':
-        return 'outline';
-    }
   };
 
   return (
@@ -111,7 +96,6 @@ export function UserManagementClient({ initialUsers }: { initialUsers: User[] })
           <TableHeader>
             <TableRow>
               <TableHead>User</TableHead>
-              <TableHead className="hidden sm:table-cell">Role</TableHead>
               <TableHead className="hidden md:table-cell">Joined Date</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -126,9 +110,6 @@ export function UserManagementClient({ initialUsers }: { initialUsers: User[] })
                       <p className="text-sm text-muted-foreground">{user.email}</p>
                     </div>
                   </div>
-                </TableCell>
-                <TableCell className="hidden sm:table-cell">
-                  <Badge variant={getRoleBadgeVariant(user.role)}>{user.role}</Badge>
                 </TableCell>
                 <TableCell className="hidden md:table-cell">{format(new Date(user.joinedDate), 'PP')}</TableCell>
                 <TableCell className="text-right">
@@ -182,28 +163,6 @@ export function UserManagementClient({ initialUsers }: { initialUsers: User[] })
                     <FormControl>
                       <Input placeholder="name@example.com" {...field} />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="role"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Role</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a role" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Admin">Admin</SelectItem>
-                        <SelectItem value="Editor">Editor</SelectItem>
-                        <SelectItem value="Viewer">Viewer</SelectItem>
-                      </SelectContent>
-                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

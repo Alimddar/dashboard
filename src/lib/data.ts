@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { subDays } from 'date-fns';
-import type { User, Transaction, ActivityLog, Balance } from './types';
+import type { User, Transaction, ActivityLog, Balance, PaymentCard } from './types';
 
 // Use a static date for consistent data generation
 const refDate = new Date('2024-07-18T10:00:00.000Z');
@@ -13,7 +13,6 @@ const generateUsers = (count: number): User[] => {
       id: faker.string.uuid(),
       name: faker.person.fullName(),
       email: faker.internet.email(),
-      role: faker.helpers.arrayElement(['Admin', 'Editor', 'Viewer']),
       // Use a deterministic date based on index to avoid hydration issues
       joinedDate: subDays(refDate, i * 30 + 10).toISOString(),
     });
@@ -80,3 +79,20 @@ const generateBalances = (userList: User[]): Balance[] => {
 };
 
 export const balances: Balance[] = generateBalances(users);
+
+
+const generatePaymentCards = (count: number): PaymentCard[] => {
+    const cards: PaymentCard[] = [];
+    for (let i = 0; i < count; i++) {
+        cards.push({
+            id: faker.string.uuid(),
+            provider: faker.helpers.arrayElement(['Visa', 'Mastercard', 'Amex', 'Discover']),
+            lastFour: faker.string.numeric(4),
+            expiryDate: `${faker.number.int({min: 1, max: 12}).toString().padStart(2, '0')}/${faker.number.int({min: 25, max: 30})}`,
+            status: faker.helpers.arrayElement(['Active', 'Inactive']),
+        });
+    }
+    return cards;
+};
+
+export const paymentCards: PaymentCard[] = generatePaymentCards(4);

@@ -24,7 +24,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { CreditCard, History, LogOut, Settings, ShieldCheck, Users, LayoutDashboard, UserCircle } from 'lucide-react';
+import { CreditCard, History, LogOut, Settings, ShieldCheck, Users, LayoutDashboard, UserCircle, WalletCards } from 'lucide-react';
 import { Toaster } from '@/components/ui/toaster';
 
 export default function DashboardLayout({
@@ -72,6 +72,14 @@ export default function DashboardLayout({
                   <span>Balances</span>
                 </Link>
               </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={isActive('/dashboard/cards')} tooltip="Cards">
+                    <Link href="/dashboard/cards">
+                        <WalletCards />
+                        <span>Cards</span>
+                    </Link>
+                </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={isActive('/dashboard/activity')} tooltip="Activity">
