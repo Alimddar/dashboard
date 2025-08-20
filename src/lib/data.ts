@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { subDays } from 'date-fns';
-import type { User, Transaction, ActivityLog, Balance, PaymentCard } from './types';
+import type { User, Transaction, Balance, PaymentCard } from './types';
 
 // Use a static date for consistent data generation
 const refDate = new Date('2024-07-18T10:00:00.000Z');
@@ -61,33 +61,6 @@ const generateTransactions = (count: number, userList: User[], cardList: Payment
 };
 
 export const transactions: Transaction[] = generateTransactions(100, users, paymentCards);
-
-const generateActivityLogs = (count: number, userList: User[]): ActivityLog[] => {
-  const logs: ActivityLog[] = [];
-  const actions = [
-    'Logged in',
-    'Updated profile',
-    'Created a new user',
-    'Deleted a user',
-    'Viewed transaction report',
-    'Flagged a transaction',
-    'Changed user permissions',
-  ];
-  for (let i = 0; i < count; i++) {
-    const user = userList[i % userList.length];
-    logs.push({
-      id: faker.string.uuid(),
-      userId: user.id,
-      userName: user.name,
-      action: actions[i % actions.length],
-      details: `User ${user.name} performed an action.`,
-      timestamp: subDays(refDate, i).toISOString(),
-    });
-  }
-  return logs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-};
-
-export const activityLogs: ActivityLog[] = generateActivityLogs(50, users);
 
 const generateBalances = (userList: User[]): Balance[] => {
   return userList.map(user => ({
