@@ -65,7 +65,6 @@ export function TransactionsClient({
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
               {transactions.length > 0 ? (
                 transactions.map(transaction => (
                   <Collapsible asChild key={transaction.id} tagName="tbody">
@@ -140,13 +139,14 @@ export function TransactionsClient({
                   </Collapsible>
                 ))
               ) : (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
-                    No transactions found.
-                  </TableCell>
-                </TableRow>
+                <TableBody>
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center">
+                      No transactions found.
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
               )}
-            </TableBody>
           </Table>
         </CardContent>
       </Card>
