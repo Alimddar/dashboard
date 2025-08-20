@@ -26,13 +26,14 @@ export const users: User[] = generateUsers(10);
 const generateTransactions = (count: number, userList: User[]): Transaction[] => {
   const transactions: Transaction[] = [];
   for (let i = 0; i < count; i++) {
-    const user = faker.helpers.arrayElement(userList);
+    const user = userList[i % userList.length]; // Cycle through users deterministically
     transactions.push({
       id: faker.string.uuid(),
       userId: user.id,
       userName: user.name,
       amount: parseFloat(faker.finance.amount({ min: 5, max: 5000, dec: 2 })),
-      date: faker.date.recent({ days: 90, refDate }).toISOString(),
+      // Use a deterministic date based on index to avoid hydration issues
+      date: subDays(refDate, i).toISOString(),
       status: faker.helpers.arrayElement(['Completed', 'Pending', 'Failed']),
       type: faker.helpers.arrayElement(['deposit', 'withdrawal', 'transfer']),
     });
@@ -54,14 +55,14 @@ const generateActivityLogs = (count: number, userList: User[]): ActivityLog[] =>
     'Changed user permissions',
   ];
   for (let i = 0; i < count; i++) {
-    const user = faker.helpers.arrayElement(userList.filter(u => u.role === 'Admin' || u.role === 'Editor'));
+    const user = userList[i % userList.length];
     logs.push({
       id: faker.string.uuid(),
       userId: user.id,
       userName: user.name,
-      action: faker.helpers.arrayElement(actions),
+      action: actions[i % actions.length],
       details: `User ${user.name} performed an action.`,
-      timestamp: faker.date.recent({ days: 30, refDate }).toISOString(),
+      timestamp: subDays(refDate, i).toISOString(),
     });
   }
   return logs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
