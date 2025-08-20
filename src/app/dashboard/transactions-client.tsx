@@ -1,21 +1,15 @@
 'use client';
 
 import * as React from 'react';
-import type { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, Filter, CheckCircle, XCircle, ChevronDown, CreditCard } from 'lucide-react';
+import { CheckCircle, XCircle, ChevronDown, CreditCard } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
 import type { Transaction, User, PaymentCard } from '@/lib/types';
 
 export function TransactionsClient({
@@ -28,37 +22,8 @@ export function TransactionsClient({
   cards: PaymentCard[];
 }) {
   const [transactions, setTransactions] = React.useState(initialTransactions);
-  const [filters, setFilters] = React.useState({
-    user: 'all',
-    amountMin: '',
-    amountMax: '',
-    dateRange: undefined as DateRange | undefined,
-  });
-
   const { toast } = useToast();
 
-  React.useEffect(() => {
-    let filtered = initialTransactions;
-
-    if (filters.user !== 'all') {
-      filtered = filtered.filter(t => t.userId === filters.user);
-    }
-    if (filters.amountMin) {
-      filtered = filtered.filter(t => t.amount >= parseFloat(filters.amountMin));
-    }
-    if (filters.amountMax) {
-      filtered = filtered.filter(t => t.amount <= parseFloat(filters.amountMax));
-    }
-    if (filters.dateRange?.from) {
-      filtered = filtered.filter(t => new Date(t.date) >= (filters.dateRange?.from as Date));
-    }
-    if (filters.dateRange?.to) {
-      filtered = filtered.filter(t => new Date(t.date) <= (filters.dateRange?.to as Date));
-    }
-
-    setTransactions(filtered);
-  }, [filters, initialTransactions]);
-  
   const handleUpdateTransactionStatus = (transactionId: string, status: 'Completed' | 'Failed') => {
     setTransactions(prevTransactions =>
       prevTransactions.map(t =>
@@ -84,80 +49,6 @@ export function TransactionsClient({
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            <CardTitle>Filter Transactions</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Select value={filters.user} onValueChange={value => setFilters(f => ({ ...f, user: value }))}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select User" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Users</SelectItem>
-                {users.map(user => (
-                  <SelectItem key={user.id} value={user.id}>
-                    {user.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                placeholder="Min Amount"
-                value={filters.amountMin}
-                onChange={e => setFilters(f => ({ ...f, amountMin: e.target.value }))}
-              />
-              <span>-</span>
-              <Input
-                type="number"
-                placeholder="Max Amount"
-                value={filters.amountMax}
-                onChange={e => setFilters(f => ({ ...f, amountMax: e.target.value }))}
-              />
-            </div>
-
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={'outline'}
-                  className={cn('w-full justify-start text-left font-normal', !filters.dateRange && 'text-muted-foreground')}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {filters.dateRange?.from ? (
-                    filters.dateRange.to ? (
-                      <>
-                        {format(filters.dateRange.from, 'LLL dd, y')} - {format(filters.dateRange.to, 'LLL dd, y')}
-                      </>
-                    ) : (
-                      format(filters.dateRange.from, 'LLL dd, y')
-                    )
-                  ) : (
-                    <span>Pick a date range</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  initialFocus
-                  mode="range"
-                  defaultMonth={filters.dateRange?.from}
-                  selected={filters.dateRange}
-                  onSelect={range => setFilters(f => ({ ...f, dateRange: range }))}
-                  numberOfMonths={2}
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-        </CardContent>
-      </Card>
-
       <Card>
         <CardHeader>
           <CardTitle>Recent Transactions</CardTitle>
