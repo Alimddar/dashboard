@@ -174,11 +174,11 @@ export function TransactionsClient({
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
+            <TableBody>
               {transactions.length > 0 ? (
                 transactions.map(transaction => (
-                  <TableBody key={transaction.id}>
-                    <Collapsible asChild>
-                      <>
+                  <Collapsible asChild key={transaction.id}>
+                    <>
                       <TableRow>
                         <TableCell>
                           <div className="flex items-center gap-3">
@@ -231,8 +231,8 @@ export function TransactionsClient({
                         </TableCell>
                       </TableRow>
                       <CollapsibleContent asChild>
-                          <tr>
-                              <td colSpan={6}>
+                          <TableRow>
+                              <TableCell colSpan={6}>
                                   <div className="p-4 bg-muted/50">
                                       <div className="flex items-center gap-3">
                                           <CreditCard className="w-6 h-6" />
@@ -242,22 +242,20 @@ export function TransactionsClient({
                                           </div>
                                       </div>
                                   </div>
-                              </td>
-                          </tr>
+                              </TableCell>
+                          </TableRow>
                       </CollapsibleContent>
-                      </>
-                    </Collapsible>
-                  </TableBody>
+                    </>
+                  </Collapsible>
                 ))
               ) : (
-                <TableBody>
-                  <TableRow>
-                    <TableCell colSpan={6} className="h-24 text-center">
-                      No transactions found.
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
+                <TableRow>
+                  <TableCell colSpan={6} className="h-24 text-center">
+                    No transactions found.
+                  </TableCell>
+                </TableRow>
               )}
+            </TableBody>
           </Table>
         </CardContent>
       </Card>
