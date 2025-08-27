@@ -2,6 +2,8 @@ import { faker } from '@faker-js/faker';
 import { subDays } from 'date-fns';
 import type { User, Transaction, Balance, PaymentCard } from './types';
 
+const API_BASE_URL = 'http://localhost:5001/api';
+
 // Use a static date for consistent data generation
 const refDate = new Date('2024-07-18T10:00:00.000Z');
 faker.seed(123);
@@ -72,3 +74,108 @@ const generateBalances = (userList: User[]): Balance[] => {
 };
 
 export const balances: Balance[] = generateBalances(users);
+
+// Real API functions for transactions
+export async function fetchTransactions(): Promise<Transaction[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/transactions?limit=100`, {
+      headers: {
+        'Cache-Control': 'no-cache',
+      },
+    });
+    
+    if (!response.ok) {
+      console.error('Failed to fetch transactions:', response.status);
+      return [];
+    }
+    
+    const data = await response.json();
+    
+    if (data.success && data.data?.transactions) {
+      return data.data.transactions;
+    }
+    
+    return [];
+  } catch (error) {
+    console.error('Error fetching transactions:', error);
+    return [];
+  }
+}
+
+export async function updateTransactionStatus(
+  transactionId: string, 
+  status: 'pending' | 'completed' | 'failed',
+  notes?: string
+): Promise<boolean> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/transactions/${transactionId}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status, notes }),
+    });
+    
+    if (!response.ok) {
+      console.error('Failed to update transaction status:', response.status);
+      return false;
+    }
+    
+    const data = await response.json();
+    return data.success;
+  } catch (error) {
+    console.error('Error updating transaction status:', error);
+    return false;
+  }
+}
+
+// Balance API functions
+export async function fetchBalances(): Promise<Balance[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/balances`, {
+      headers: {
+        'Cache-Control': 'no-cache',
+      },
+    });
+    
+    if (!response.ok) {
+      console.error('Failed to fetch balances:', response.status);
+      return [];
+    }
+    
+    const data = await response.json();
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching balances:', error);
+    return [];
+  }
+}
+
+export async function updateBalance(
+  userId: string,
+  newBalance: number
+): Promise<boolean> {
+  try {
+    console.log('Updating balance for userId:', userId, 'newBalance:', newBalance);
+    console.log('API URL:', `${API_BASE_URL}/balances/${userId}`);
+    
+    const response = await fetch(`${API_BASE_URL}/balances/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ balance: newBalance }),
+    });
+    
+    if (!response.ok) {
+      console.error('Failed to update balance:', response.status);
+      return false;
+    }
+    
+    const data = await response.json();
+    return data.success;
+  } catch (error) {
+    console.error('Error updating balance:', error);
+    return false;
+  }
+}

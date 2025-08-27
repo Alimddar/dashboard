@@ -35,6 +35,11 @@ type UserFormValues = z.infer<typeof userFormSchema>;
 
 export function UserManagementClient({ initialUsers }: { initialUsers: User[] }) {
   const [users, setUsers] = React.useState(initialUsers);
+  
+  React.useEffect(() => {
+    console.log('Initial users:', initialUsers);
+    console.log('Users count:', initialUsers?.length || 0);
+  }, [initialUsers]);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [editingUser, setEditingUser] = React.useState<User | null>(null);
   const { toast } = useToast();
@@ -101,32 +106,40 @@ export function UserManagementClient({ initialUsers }: { initialUsers: User[] })
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map(user => (
-              <TableRow key={user.id}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <div>
-                      <p className="font-medium">{user.name}</p>
-                      <p className="text-sm text-muted-foreground">{user.email}</p>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell className="hidden md:table-cell">{format(new Date(user.joinedDate), 'PP')}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => handleOpenDialog(user)}>Edit</DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteUser(user.id)}>Delete</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+            {users.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
+                  No users found. {initialUsers?.length === 0 ? 'Database might be empty or connection failed.' : 'Loading...'}
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              users.map(user => (
+                <TableRow key={user.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <p className="font-medium">{user.name}</p>
+                        <p className="text-sm text-muted-foreground">{user.email}</p>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">{format(new Date(user.joinedDate), 'PP')}</TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => handleOpenDialog(user)}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteUser(user.id)}>Delete</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </CardContent>

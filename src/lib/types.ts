@@ -8,14 +8,22 @@ export type User = {
 export type Transaction = {
   id: string;
   userId: string;
-  userName: string;
+  user: {
+    id: string;
+    username: string;
+    email?: string;
+    name?: string;
+    surname?: string;
+  };
   amount: number;
-  date: string;
-  status: 'Completed' | 'Pending' | 'Failed';
-  type: 'deposit' | 'withdrawal' | 'transfer';
-  cardId: string;
-  cardProvider: string;
-  cardLastFour: string;
+  paymentMethod: 'card-deposit' | 'm10' | 'mpay';
+  status: 'pending' | 'completed' | 'failed';
+  paymentCredentials?: any;
+  receiptUrl?: string;
+  transactionReference?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type Balance = {
